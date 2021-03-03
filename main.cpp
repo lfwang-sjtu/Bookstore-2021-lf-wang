@@ -121,16 +121,33 @@ void register_(stringstream &sstream, vector<User> &loginSystem){
 void delete_(stringstream &sstream, vector<User> &loginSystem){
     string id;
     sstream >> id;
-    if (loginSystem[loginSystem.size() - 1].getLevel() == 7){
-
+    if (!loginSystem.empty() && loginSystem[loginSystem.size() - 1].getLevel() == 7){
+        BlockList user_index("_user.index");
+        vector<int> single_offset = user_index.find(id);
+        if (single_offset.size() != 1) {cerr << "different people using the same ID\n";}
+        node toDelete(id, single_offset[0]);
+        user_index.erase(toDelete);
+        User user;
+        fstream file("_user.data", ios::in | ios::out | ios::binary);
+        file.seekp(toDelete.get_offset(), ios::beg);
+        file.write(reinterpret_cast<char *>(&user), sizeof(User));
+        file.close();
     }
     else throw "nope";
 }
 
 void passwd_(stringstream &sstream, vector<User> &loginSystem){
     string id, old_passwd, new_passwd;
-    if (loginSystem[loginSystem.size() - 1].getLevel() == 7){
+    if (!loginSystem.empty() && loginSystem[loginSystem.size() - 1].getLevel() == 7){
         sstream >> id >> new_passwd;
+        BlockList user_index("_user.index");
+        User user;
+        vector<int> single_offset = user_index.find(id);
+        if (single_offset.size() != 1) {cerr << "different people using the same ID\n";}
+
+        fstream file("_user.data", ios::in | ios::out | ios::binary);
+        file.seekg(single_offset[0], ios::beg);
+        file.read(reinterpret_cast<char *>(&user), sizeof(User));
     }
     else{
         sstream >> id >> old_passwd >> new_passwd;
