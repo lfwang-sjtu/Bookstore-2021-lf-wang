@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.15)
 project(Bookstore_2021)
 
 set(CMAKE_CXX_STANDARD 14)
